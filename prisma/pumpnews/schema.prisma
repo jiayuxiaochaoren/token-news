@@ -1,0 +1,358 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/pumpnews"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model tokens {
+  id                     Int      @id @unique @default(autoincrement())
+  address                String   @unique
+  symbol                 String   @default("")
+  name                   String   @default("")
+  decimals               Int      @default(0)
+  metadata               Json
+  network                String   @default("solana")
+  token_created_at       Int      @default(0)
+  created_at             DateTime @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime @default(now()) @db.Timestamptz(6)
+  social_links           Json     @default("[]")
+  tweet_analyze          String   @default("")
+  pumpfun                Json?
+  profile                Json?
+  headline               String   @default("")
+  officials              String[] @default([])
+  from_pumpfun_listening Boolean  @default(false)
+  completed_time         Int      @default(0)
+  analysis               Json?
+  related_accounts       Json?
+
+  @@index([address])
+  @@index([from_pumpfun_listening, completed_time])
+}
+
+model privy_user {
+  id                  Int        @id @unique @default(autoincrement())
+  did                 String     @unique
+  created_at          DateTime   @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime   @default(now()) @db.Timestamptz(6)
+  email               String     @unique
+  pro                 Int        @default(0)
+  exp                 Int        @default(0)
+  invite_code         String?
+  invite_code_bind_at Int?       @default(0)
+  referral            String?
+  pro_config          pro_config @relation(fields: [pro], references: [id])
+
+  @@index([did])
+}
+
+model ai_analyze {
+  id            Int      @id @unique @default(autoincrement())
+  token_address String
+  analyze_en    String   @default("")
+  analyze_zh    String   @default("")
+  tweets        Json     @default("[]")
+  network       String   @default("solana")
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  symbol        String   @default("")
+  search_tweets Json     @default("[]")
+  ai_resp       Json?
+  template      String?
+  type          String   @default("")
+  version       String   @default("v0.0.1")
+
+  @@index([token_address, id(sort: Desc)])
+}
+
+model ruler_tweets {
+  id            Int      @id @unique @default(autoincrement())
+  token_address String
+  symbol        String   @default("")
+  network       String   @default("solana")
+  tweet_id      String   @unique @default("")
+  tweet_time    Int      @default(0)
+  author        String   @default("")
+  content       Json
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([tweet_id, token_address])
+  @@index([token_address])
+  @@index([tweet_id])
+}
+
+model token_interact {
+  id            Int      @id @unique @default(autoincrement())
+  token_address String   @unique
+  network       String   @default("solana")
+  liker         String[]
+  disliker      String[]
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([token_address])
+}
+
+model pro_logs {
+  id         Int      @id @unique @default(autoincrement())
+  did        String?
+  signature  String   @unique
+  level      Int      @default(1)
+  renewal    Int      @default(0)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  email      String?
+
+  @@index([did])
+}
+
+model tweets {
+  id               Int      @id @unique @default(autoincrement())
+  token_address    String
+  symbol           String   @default("")
+  network          String   @default("solana")
+  tweet_id         String   @default("")
+  user_id          String   @default("")
+  text             String   @default("")
+  medias           Json?
+  is_self_send     Boolean  @default(false)
+  is_retweet       Boolean  @default(false)
+  is_quote         Boolean  @default(false)
+  is_reply         Boolean  @default(false)
+  is_like          Boolean  @default(false)
+  related_tweet_id String   @default("")
+  related_user_id  String   @default("")
+  favorite_count   Int      @default(0)
+  quote_count      Int      @default(0)
+  reply_count      Int      @default(0)
+  retweet_count    Int      @default(0)
+  author           String   @default("")
+  user             Json     @default("{}")
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @db.Timestamptz(6)
+  created_time     Int      @default(0)
+  link             String   @default("")
+  media_type       String   @default("")
+  token_image      String   @default("")
+  related_tweets   Json     @default("[]")
+  views            Int      @default(0)
+  is_official      Boolean  @default(false)
+  text_zh          String   @default("")
+
+  @@unique([tweet_id, token_address])
+  @@index([tweet_id])
+  @@index([token_address, created_time(sort: Desc)])
+}
+
+model filter_rulers {
+  id         Int      @id @unique @default(autoincrement())
+  type       String   @unique @default("content")
+  list       String[] @default([])
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([type])
+}
+
+model tweet_latest_id {
+  id            Int      @id @unique @default(autoincrement())
+  tweet_id      String   @unique @default("")
+  created_time  Int      @default(0)
+  token_address String   @unique @default("")
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([tweet_id])
+}
+
+model reference_tokens {
+  id               Int      @id @unique @default(autoincrement())
+  address          String   @unique
+  symbol           String   @default("")
+  name             String   @default("")
+  decimals         Int      @default(0)
+  metadata         Json
+  network          String   @default("solana")
+  token_created_at Int      @default(0)
+  social_links     Json     @default("[]")
+  tweet_analyze    String   @default("")
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  updated_at       DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model invite_code {
+  id         Int      @id @unique @default(autoincrement())
+  code       String   @unique @default("")
+  user_did   String   @default("")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  user_email String?
+  pending    Int      @default(0)
+}
+
+model pro_config {
+  id         Int          @id @unique @default(autoincrement())
+  config     Json
+  created_at DateTime     @default(now()) @db.Timestamptz(6)
+  privy_user privy_user[]
+}
+
+model user_service_call_logs {
+  id         Int      @id @unique @default(autoincrement())
+  did        String
+  call_date  Int      @default(0)
+  call_count Int      @default(0)
+  service    String   @default("optimize")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([did, call_date, service])
+  @@index([did, call_date, service])
+}
+
+model invite_code_bind_logs {
+  id         Int      @id @unique @default(autoincrement())
+  code       String   @unique
+  email      String
+  signature  String   @unique
+  did        String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model watchlist {
+  id            Int      @id @unique @default(autoincrement())
+  did           String
+  token_address String
+  token_symbol  String?
+  url           String?
+  network       String   @default("solana")
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([did, token_address, network])
+  @@index([did, network])
+}
+
+model click_logs {
+  id         Int      @id @unique @default(autoincrement())
+  did        String   @default("")
+  type       String   @default("")
+  content    String   @default("")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([content])
+  @@index([type])
+}
+
+model smart_wallets {
+  id             Int      @id @unique @default(autoincrement())
+  address        String   @unique
+  twitter_handle String?
+  account_info   Json?
+  network        String   @default("solana")
+  created_at     DateTime @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+  alias          String?
+
+  @@index([address])
+}
+
+model community {
+  id                 Int                  @id @unique @default(autoincrement())
+  name               String               @unique
+  contact            String?
+  created_at         DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime             @default(now()) @db.Timestamptz(6)
+  community_referral community_referral[]
+  community_revenue  community_revenue[]
+
+  @@index([name])
+}
+
+model community_referral {
+  id              Int       @id @unique @default(autoincrement())
+  expiration_date Int       @default(0)
+  state           Int       @default(1) @db.SmallInt
+  code            String    @unique
+  community_id    Int       @default(0)
+  proportion      Float     @default(0) @db.Real
+  sol_address     String
+  eth_address     String?
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @default(now()) @db.Timestamptz(6)
+  community       community @relation(fields: [community_id], references: [id])
+
+  @@index([code])
+  @@index([community_id])
+}
+
+model community_referral_payed_logs {
+  id                Int               @id @unique @default(autoincrement())
+  ref_revenue       Int               @default(0)
+  token             String
+  type              String
+  amount            Float             @db.Real
+  signature         String            @unique
+  network           String            @default("solana")
+  payee_address     String
+  created_at        DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime          @default(now()) @db.Timestamptz(6)
+  community_revenue community_revenue @relation(fields: [ref_revenue], references: [id])
+
+  @@index([ref_revenue])
+}
+
+model community_referral_revenue_logs {
+  id                Int               @id @unique @default(autoincrement())
+  user              String
+  amount            Float             @db.Real
+  token             String
+  type              String
+  ref_code          String
+  proportion        Float             @db.Real
+  signature         String            @unique
+  network           String            @default("solana")
+  ref_revenue       Int               @default(0)
+  created_at        DateTime          @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime          @default(now()) @db.Timestamptz(6)
+  community_revenue community_revenue @relation(fields: [ref_revenue], references: [id])
+
+  @@index([ref_code])
+  @@index([ref_revenue])
+}
+
+model community_revenue {
+  id                              Int                               @id @unique @default(autoincrement())
+  community_id                    Int                               @default(0)
+  token                           String                            @default("SOL")
+  total                           Float                             @default(0) @db.Real
+  proportion                      Float                             @default(0) @db.Real
+  payed                           Float                             @default(0) @db.Real
+  created_at                      DateTime                          @default(now()) @db.Timestamptz(6)
+  updated_at                      DateTime                          @default(now()) @db.Timestamptz(6)
+  community_referral_payed_logs   community_referral_payed_logs[]
+  community_referral_revenue_logs community_referral_revenue_logs[]
+  community                       community                         @relation(fields: [community_id], references: [id])
+
+  @@unique([community_id, token])
+  @@index([community_id])
+}
+
+model rag_tokens {
+  id            Int      @id @unique @default(autoincrement())
+  token_address String   @unique
+  token_symbol  String   @default("")
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  network       String   @default("solana")
+
+  @@index([token_address])
+}

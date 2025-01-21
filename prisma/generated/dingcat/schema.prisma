@@ -1,0 +1,343 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/dingcat"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_DINGCAT_URL")
+  directUrl = env("DATABASE_DINGCAT_DIRECT_URL")
+}
+
+model favorite {
+  id               Int        @id @unique @default(autoincrement())
+  favorite_address String
+  state            Int        @default(1)
+  privy_address    String     @default("")
+  user_did         String
+  updated_at       DateTime   @default(now()) @db.Timestamptz(6)
+  privy_user       privy_user @relation(fields: [user_did], references: [did])
+
+  @@unique([user_did, favorite_address])
+}
+
+model gangs {
+  id             Int             @id @unique @default(autoincrement())
+  user_address   String          @default("")
+  name           String
+  created_at     DateTime        @default(now()) @db.Timestamptz(6)
+  admins         Json            @default("[]") @db.Json
+  members        Json            @default("[]") @db.Json
+  type           Int             @default(0)
+  user_did       String
+  is_published   Boolean         @default(false)
+  published_time Int             @default(0)
+  description    String          @default("")
+  updated_at     DateTime        @default(now()) @db.Timestamptz(6)
+  privy_user     privy_user      @relation(fields: [user_did], references: [did])
+  wallets_users  wallets_users[]
+
+  @@unique([name, user_did])
+}
+
+model latest_sync_trans {
+  id         BigInt   @unique @default(autoincrement())
+  signature  String   @unique
+  address    String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model pass {
+  id         String   @id @db.Uuid
+  username   String   @unique
+  password   String
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([username])
+}
+
+model privy_user {
+  id                   Int                    @id @unique @default(autoincrement())
+  address              String                 @default("")
+  txs_switch           Boolean                @default(true)
+  dis_switch           Boolean                @default(true)
+  multiple_switch      Boolean                @default(true)
+  tts_switch           Boolean                @default(true)
+  range_times          String                 @default("00:00-23:59")
+  created_at           DateTime               @default(now()) @db.Timestamptz(6)
+  gangs_collect        Int[]
+  auto_buy_setting     Json?                  @db.Json
+  swap_setting         Json?                  @db.Json
+  tg_bot               Json?                  @db.Json
+  did                  String                 @unique
+  black_time           Int                    @default(0)
+  updated_at           DateTime               @default(now()) @db.Timestamptz(6)
+  fomo_setting         Json?                  @default("{\"timer\": 5, \"smartbuy\": 5}")
+  favorite             favorite[]
+  gangs                gangs[]
+  tts                  tts[]
+  user_watching_tokens user_watching_tokens[]
+  wallets_users        wallets_users[]
+
+  @@index([did, address])
+}
+
+model privy_users_tokens {
+  id             BigInt   @unique @default(autoincrement())
+  walletAddress  String
+  tokenAddress   String
+  balance        BigInt   @default(0)
+  total_amount   BigInt   @default(0)
+  token_address  String   @default("")
+  wallet_address String   @default("")
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([walletAddress, tokenAddress])
+  @@index([walletAddress, tokenAddress])
+}
+
+model problem_trans {
+  id         BigInt   @unique @default(autoincrement())
+  signature  String   @unique
+  state      Int      @default(0) @db.SmallInt
+  source     String   @default("listen")
+  result     String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model sol_price {
+  id         Int      @id @unique @default(autoincrement())
+  price      String   @default("0")
+  time       Int      @default(0)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([time])
+}
+
+model sorted_tags {
+  id         Int      @id @unique @default(autoincrement())
+  tag        String
+  amount     Int      @default(0)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  wallet     String
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([tag, wallet])
+}
+
+model swap {
+  id           Int      @id @unique @default(autoincrement())
+  wallet       String
+  token        String
+  actions      Json?    @db.Json
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  signature    String   @unique
+  sol_price    String   @default("0")
+  state        String   @default("success")
+  swap_type    String   @default("buy")
+  slippage     Float    @default(0) @db.Real
+  fee          BigInt   @default(0)
+  blocktime    Int      @default(0)
+  from_address String?  @default("")
+  network      String   @default("solana")
+  swap         Json?    @db.Json
+  to_address   String?  @default("")
+  fdv          Decimal  @default(0) @db.Decimal(20, 2)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([wallet, token])
+}
+
+model tokens {
+  id                 BigInt   @unique @default(autoincrement())
+  symbol             String
+  address            String   @unique
+  name               String?
+  uri                String?
+  decimals           Int      @default(0) @db.SmallInt
+  metadata           Json?    @db.Json
+  async              Boolean? @default(false)
+  followers          Int?     @default(0)
+  twitter_handle     String?  @default("")
+  twitter_name       String?  @default("")
+  created_at         DateTime @default(now()) @db.Timestamptz(6)
+  supply             BigInt   @default(0)
+  network            String   @default("solana")
+  token_created_time Int      @default(0)
+  updated_at         DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([address])
+}
+
+model transactions {
+  id           BigInt   @unique @default(autoincrement())
+  signature    String   @unique
+  address      String
+  blocktime    Int      @default(0)
+  created_at   DateTime @default(now()) @db.Timestamptz(6)
+  actions      Json?    @db.Json
+  block        BigInt   @default(0)
+  sol_price    String   @default("0")
+  swap_actions Json?    @db.Json
+  swap_type    String   @default("buy")
+  token        String?
+  from_address String?  @default("")
+  network      String   @default("solana")
+  state        String   @default("success")
+  swap         Json?    @db.Json
+  to_address   String?  @default("")
+  fdv          Decimal  @default(0) @db.Decimal(20, 2)
+  updated_at   DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([address])
+  @@index([blocktime])
+  @@index([signature])
+  @@index([swap_type])
+  @@index([token])
+}
+
+model tts {
+  id            Int        @id @unique @default(autoincrement())
+  tts_address   String
+  state         Int        @default(1)
+  privy_address String     @default("")
+  user_did      String
+  updated_at    DateTime   @default(now()) @db.Timestamptz(6)
+  privy_user    privy_user @relation(fields: [user_did], references: [did])
+
+  @@unique([user_did, tts_address])
+}
+
+model user_watching_tokens {
+  id            Int        @id @unique @default(autoincrement())
+  created_at    DateTime   @default(now()) @db.Timestamptz(6)
+  token_address String
+  state         Int        @default(1)
+  privy_address String     @default("")
+  user_did      String
+  updated_at    DateTime   @default(now()) @db.Timestamptz(6)
+  privy_user    privy_user @relation(fields: [user_did], references: [did])
+
+  @@unique([user_did, token_address])
+}
+
+model users {
+  id         BigInt   @id @unique @default(autoincrement())
+  address    String   @unique
+  state      Int      @default(1) @db.SmallInt
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([address])
+}
+
+model users_tokens {
+  id             BigInt   @unique @default(autoincrement())
+  walletAddress  String
+  tokenAddress   String
+  balance        BigInt   @default(0)
+  total_amount   BigInt   @default(0)
+  token_address  String   @default("")
+  wallet_address String   @default("")
+  updated_at     DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([walletAddress, tokenAddress])
+  @@index([walletAddress, tokenAddress])
+}
+
+model wallets {
+  id            BigInt          @id @unique @default(autoincrement())
+  address       String          @unique
+  state         Int             @default(1) @db.SmallInt
+  created_at    DateTime        @default(now()) @db.Timestamptz(6)
+  type          String          @default("v1")
+  black_time    Int             @default(0)
+  updated_at    DateTime        @default(now()) @db.Timestamptz(6)
+  wallets_users wallets_users[]
+}
+
+model wallets_transactions {
+  id         BigInt   @unique @default(autoincrement())
+  signature  String   @unique
+  address    String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  accounts   String[] @default([])
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+
+  @@index([address, signature])
+  @@index([accounts, signature])
+  @@index([signature])
+}
+
+model wallets_users {
+  id             BigInt     @id @unique @default(autoincrement())
+  wallet_address String
+  user_address   String     @default("")
+  created_at     DateTime   @default(now()) @db.Timestamptz(6)
+  name           String     @default("")
+  tag            Json       @default("[]") @db.Json
+  gangs_id       Int?
+  user_did       String
+  updated_at     DateTime   @default(now()) @db.Timestamptz(6)
+  gangs          gangs?     @relation(fields: [gangs_id], references: [id])
+  privy_user     privy_user @relation(fields: [user_did], references: [did], onDelete: NoAction, onUpdate: NoAction)
+  wallets        wallets    @relation(fields: [wallet_address], references: [address], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([wallet_address, user_did, gangs_id], map: "wallet_address_user_did_gangs_id_unique")
+  @@index([wallet_address])
+  @@index([gangs_id])
+  @@index([user_did])
+}
+
+model alert_messages {
+  id         Int      @id @unique @default(autoincrement())
+  user_did   String
+  message    Json
+  wallets    Json     @default("[]")
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  network    String   @default("solana")
+
+  @@index([user_did])
+}
+
+model fomo_alert {
+  id            Int      @id @unique @default(autoincrement())
+  user_did      String
+  token_address String
+  wallets       Json     @default("[]")
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+  network       String   @default("solana")
+
+  @@unique([user_did, token_address])
+  @@index([user_did, token_address])
+}
+
+model wallet_alias {
+  id             Int    @id @unique @default(autoincrement())
+  did            String
+  wallet_address String
+  name           String
+
+  @@unique([did, wallet_address])
+  @@index([did])
+}
+
+model cabal_tokens {
+  id            Int      @id @unique @default(autoincrement())
+  did           String
+  symbol        String?
+  name          String?
+  url           String?
+  decimals      Int      @default(0) @db.SmallInt
+  network       String   @default("solana")
+  token_address String
+  created_at    DateTime @default(now()) @db.Timestamptz(6)
+  updated_at    DateTime @default(now()) @db.Timestamptz(6)
+
+  @@unique([did, token_address, network])
+  @@index([did])
+}
