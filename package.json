@@ -11,7 +11,7 @@
     "db:generate:dingcat": "prisma generate --schema=./prisma/dingcat/schema.prisma",
     "db:pull:pumpnews": "prisma db pull --schema=./prisma/pumpnews/schema.prisma",
     "db:generate:pumpnews": "prisma generate --schema=./prisma/pumpnews/schema.prisma",
-    "postinstall": "npm run db:generate:pumpnews"
+    "postinstall": "npm run db:generate:pumpnews && npm run db:generate:dingcat"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.1",
