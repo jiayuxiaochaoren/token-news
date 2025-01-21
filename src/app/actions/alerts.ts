@@ -1,3 +1,5 @@
+"use server";
+
 import { ALERT_LIMIT, DINGCAT_USER_DID } from "@/constants";
 import { dingcatDb } from "@/db/prisma";
 import { MessageStruct } from "@/types/alert";

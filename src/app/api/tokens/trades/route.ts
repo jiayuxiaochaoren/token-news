@@ -20,8 +20,7 @@ export async function GET(request: NextRequest) {
     });
 
     const tokenOverview = resp?.data?.data as BirdEyeTokenOverview;
-
-    return {
+    const data = {
       holder: tokenOverview?.holder || 0,
       price: tokenOverview?.price || 0,
       mc: tokenOverview?.mc || 0,
@@ -31,6 +30,7 @@ export async function GET(request: NextRequest) {
         h8: tokenOverview?.v8hUSD || 0,
       },
     };
+    return NextResponse.json(data);
   } catch (error) {
     console.error("Error fetching tweets:", error);
     return NextResponse.json(
