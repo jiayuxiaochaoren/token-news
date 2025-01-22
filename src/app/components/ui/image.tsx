@@ -18,6 +18,8 @@ export function Image({
   className,
   ...props
 }: ImageProps) {
+  console.log(props.width, props.height, "dddd");
+
   const [error, setError] = useState(false);
 
   const imageClasses = cn(
@@ -50,13 +52,19 @@ export function Image({
       </div>
     );
   }
-
   return (
-    <div className="rounded-full overflow-hidden">
+    <div
+      className={`rounded-full overflow-hidden w-[${props.width || 48}px] h-[${
+        props.height || 48
+      }px] relative`}
+    >
       <NextImage
-        width={props.width || 48}
-        height={props.height || 48}
         {...props}
+        style={{
+          width: props.width || 48,
+          height: props.height || 48,
+          objectFit: "cover",
+        }}
         alt={alt}
         onError={() => setError(true)}
         className={imageClasses}

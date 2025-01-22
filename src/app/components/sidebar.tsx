@@ -17,6 +17,7 @@ import { useToken } from "@/contexts/token-context";
 import useSWR from "swr";
 import { fetcher } from "@/_lib/fetcher";
 import { HotTokenInfo } from "@/types/tokens";
+import { DINGCAT_USER_DID } from "@/constants";
 
 type ViewMode = "alert" | "rank";
 
@@ -59,9 +60,7 @@ export function Sidebar({ defaultList }: { defaultList: MessageStruct[] }) {
     let channel: Channel;
     const event = "fomoAlert";
 
-    channel = pusher.subscribe(
-      `newTrans_${process.env.NEXT_PUBLIC_LISTENING_DID}`
-    );
+    channel = pusher.subscribe(`newTrans_solana_${DINGCAT_USER_DID}`);
     channel.bind(event, handleNewPusher);
 
     return () => {
@@ -126,15 +125,17 @@ export function Sidebar({ defaultList }: { defaultList: MessageStruct[] }) {
                     }`}
                   >
                     <div className="p-2">
-                      <div className="flex items-start gap-2 ">
-                        <Image
-                          src={alert?.token_image ?? ""}
-                          alt={alert?.symbol ?? ""}
-                          width={48}
-                          height={48}
-                        />
-                        <div className="flex flex-col w-full">
-                          <div className="flex items-center flex-row justify-between">
+                      <div className="flex items-start">
+                        <div className="flex-shrink-0">
+                          <Image
+                            src={alert?.token_image ?? ""}
+                            alt={alert?.symbol ?? ""}
+                            width={38}
+                            height={38}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0 ml-2">
+                          <div className="flex items-center justify-between">
                             <div className="flex items-center gap-1.5">
                               <span className="text-base font-medium text-[#ffffff]">
                                 {alert?.symbol}
@@ -149,8 +150,8 @@ export function Sidebar({ defaultList }: { defaultList: MessageStruct[] }) {
                             </span>
                           </div>
 
-                          <div className="flex flex-row items-center justify-between">
-                            <span className="text-sm text-[#737373] mb-2">
+                          <div className="flex  items-center justify-between mb-2">
+                            <span className="text-sm text-[#737373] ">
                               {alert?.name}
                             </span>
 
@@ -210,12 +211,15 @@ export function Sidebar({ defaultList }: { defaultList: MessageStruct[] }) {
                   >
                     <div className="p-2">
                       <div className="flex items-start gap-2 ">
-                        <Image
-                          src={alert?.token_image ?? ""}
-                          alt={alert?.symbol ?? ""}
-                          width={48}
-                          height={48}
-                        />
+                        <div className="flex-shrink-0">
+                          <Image
+                            src={alert?.token_image ?? ""}
+                            alt={alert?.symbol ?? ""}
+                            width={38}
+                            height={38}
+                          />
+                        </div>
+
                         <div className="flex flex-col w-full">
                           <div className="flex items-center flex-row justify-between">
                             <div className="flex items-center gap-1.5">
