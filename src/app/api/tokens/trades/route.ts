@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import axios from "axios";
 import { BIRDEYE_API_HOST, BIRDEYE_API_KEY } from "@/constants";
-import { BirdEyeTokenOverview } from "@/types/market";
+import {
+  BirdEyeTokenOverview,
+  BirdEyeTokenSimpleOverview,
+} from "@/types/market";
 
 export async function GET(request: NextRequest) {
   const tokenAddress = request.nextUrl.searchParams.get("tokenAddress") || "";
@@ -20,7 +23,7 @@ export async function GET(request: NextRequest) {
     });
 
     const tokenOverview = resp?.data?.data as BirdEyeTokenOverview;
-    const data = {
+    const data: BirdEyeTokenSimpleOverview = {
       holder: tokenOverview?.holder || 0,
       price: tokenOverview?.price || 0,
       mc: tokenOverview?.mc || 0,
@@ -28,7 +31,15 @@ export async function GET(request: NextRequest) {
         m30: tokenOverview?.v30mUSD || 0,
         h1: tokenOverview?.v1hUSD || 0,
         h8: tokenOverview?.v8hUSD || 0,
+        h24: tokenOverview?.v24hUSD || 0,
       },
+      priceChange: {
+        h1: tokenOverview?.priceChange1hPercent || 0,
+        h6: tokenOverview?.priceChange6hPercent || 0,
+        h24: tokenOverview?.priceChange24hPercent || 0,
+        m30: tokenOverview?.priceChange30mPercent || 0,
+      },
+      tokenImage: tokenOverview?.logoURI,
     };
     return NextResponse.json(data);
   } catch (error) {

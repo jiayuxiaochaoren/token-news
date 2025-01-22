@@ -1,12 +1,18 @@
 import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { Image } from "@/app/components/ui/image";
-import { TokenMarketInfo } from "@/types/market";
-import { abbreviateString } from "@/_lib/helper";
+import { BirdEyeTokenSimpleOverview, TokenMarketInfo } from "@/types/market";
+import {
+  abbreviateString,
+  formatCurrency,
+  roundPriceWithoutSub,
+} from "@/_lib/helper";
 
 export function TokenHeader({
+  birdeyeData,
   marketData,
   tokenImage,
 }: {
+  birdeyeData: BirdEyeTokenSimpleOverview;
   marketData: TokenMarketInfo;
   tokenImage: string;
 }) {
@@ -36,24 +42,28 @@ export function TokenHeader({
       </div>
       <div className="flex items-center gap-4">
         <div className="text-right">
-          <span className="text-xl font-bold">${marketData?.priceUsd}</span>
+          <span className="text-xl font-bold">
+            ${roundPriceWithoutSub(birdeyeData?.price)}
+          </span>
           <span className="text-[#a3a3a3] mx-2">|</span>
-          <span className="text-xl font-bold">MC ${marketData?.marketCap}</span>
+          <span className="text-xl font-bold">
+            MC {formatCurrency(birdeyeData?.mc)}
+          </span>
         </div>
         <div className="flex items-center text-[#d4f932] gap-1">
-          {marketData?.priceChange?.h1 && marketData?.priceChange?.h1 > 0 ? (
+          {birdeyeData?.priceChange?.h1 && birdeyeData?.priceChange?.h1 > 0 ? (
             <ArrowUpIcon className="h-4 w-4 text-green-500" />
           ) : (
             <ArrowDownIcon className="h-4 w-4 text-red-500" />
           )}
           <span
             className={`${
-              marketData?.priceChange?.h1 && marketData?.priceChange?.h1 > 0
+              birdeyeData?.priceChange?.h1 && birdeyeData?.priceChange?.h1 > 0
                 ? "text-green-500"
                 : "text-red-500"
             }`}
           >
-            {marketData?.priceChange?.h1}%
+            {birdeyeData?.priceChange?.h1?.toFixed(0)}%
           </span>
         </div>
       </div>

@@ -48,4 +48,27 @@ export type BirdEyeTokenOverview = {
   v1hUSD: number;
   v30mUSD: number;
   v8hUSD: number;
+  priceChange1hPercent: number;
+  priceChange24hPercent: number;
+  priceChange30mPercent: number;
+  priceChange6hPercent: number;
+};
+
+export type BirdEyeTokenSimpleOverview = {
+  holder: number;
+  price: number;
+  mc: number;
+  volume: {
+    m30: number;
+    h1: number;
+    h8: number;
+    h24: number;
+  };
+  priceChange: {
+    h1: number;
+    h6: number;
+    h24: number;
+    m30: number;
+  };
+  tokenImage: string;
 };

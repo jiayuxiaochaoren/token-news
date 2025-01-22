@@ -18,8 +18,6 @@ export function Image({
   className,
   ...props
 }: ImageProps) {
-  console.log(props.width, props.height, "dddd");
-
   const [error, setError] = useState(false);
 
   const imageClasses = cn(
@@ -34,41 +32,36 @@ export function Image({
     className
   );
 
-  if (error) {
+  if (error || !props.src) {
     return (
       <div
         className={containerClasses}
-        style={{ width: props.width || 48, height: props.height || 48 }}
+        style={{ width: props.width, height: props.height }}
       >
-        <div className="flex flex-col items-center p-4">
+        <div className="flex flex-col items-center">
           {!alt ? (
-            <ImageOffIcon className="w-8 h-8 mb-2" />
+            <ImageOffIcon className="w-5 h-5" />
           ) : (
-            <span className="text-xl text-center">
-              {alt?.slice(0, 2) || ""}
+            <span className="text-base font-medium">
+              {alt?.slice(0, 2).toUpperCase() || ""}
             </span>
           )}
         </div>
       </div>
     );
   }
+
   return (
-    <div
-      className={`rounded-full overflow-hidden w-[${props.width || 48}px] h-[${
-        props.height || 48
-      }px] relative`}
-    >
-      <NextImage
-        {...props}
-        style={{
-          width: props.width || 48,
-          height: props.height || 48,
-          objectFit: "cover",
-        }}
-        alt={alt}
-        onError={() => setError(true)}
-        className={imageClasses}
-      />
-    </div>
+    <NextImage
+      {...props}
+      alt={alt}
+      onError={() => setError(true)}
+      className={imageClasses}
+      style={{
+        width: props.width,
+        height: props.height,
+        objectFit: "cover",
+      }}
+    />
   );
 }

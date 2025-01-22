@@ -8,7 +8,7 @@ import {
 
 interface MetricCardProps {
   title: string;
-  value: number;
+  value: number | string;
   icon: "lightbulb" | "twitter" | "bar-chart" | "users";
   changes: {
     fiveMin: string;
@@ -39,10 +39,7 @@ export function MetricCard({ title, value, icon, changes }: MetricCardProps) {
           {changes.fiveMin}
         </div>
       </div>
-      <div className="text-2xl font-bold mb-4">
-        {title === "Vol" ? "$" : ""}
-        {value.toLocaleString()}
-      </div>
+      <div className="text-2xl font-bold mb-4">{value}</div>
       <div className="grid grid-cols-3 gap-2 text-xs">
         <div>
           <div className="text-[#a3a3a3]">5min</div>

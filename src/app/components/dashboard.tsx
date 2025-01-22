@@ -16,11 +16,12 @@ import {
 import { useLoading } from "@/contexts/loading-context";
 import { useToken } from "@/contexts/token-context";
 import useSWR from "swr";
-import { getMarketData, getTokenOverviewByBirdEye } from "../actions/market";
-import { TokenMarketInfo } from "@/types/market";
+import { getMarketData } from "../actions/market";
+import { BirdEyeTokenSimpleOverview, TokenMarketInfo } from "@/types/market";
 import { fetcher } from "@/_lib/fetcher";
 import { AiAnalyze } from "@/types/analyze";
-import { IncrementTweetsStats, TwitterStruct } from "@/types/tweets";
+import { TwitterStruct } from "@/types/tweets";
+import { formatCurrency } from "@/_lib/helper";
 
 type SocialViewMode = "like" | "views" | "latest" | "followers";
 
@@ -58,13 +59,14 @@ export function Dashboard() {
     }
   );
 
-  const { data: birdeyeData, error: birdeyeError } = useSWR(
-    selectedToken ? `/api/tokens/trades?tokenAddress=${selectedToken}` : null,
-    fetcher,
-    {
-      refreshInterval: selectedToken ? 5000 : 0,
-    }
-  );
+  const { data: birdeyeData, error: birdeyeError } =
+    useSWR<BirdEyeTokenSimpleOverview>(
+      selectedToken ? `/api/tokens/trades?tokenAddress=${selectedToken}` : null,
+      fetcher,
+      {
+        refreshInterval: selectedToken ? 5000 : 0,
+      }
+    );
 
   // const { data: incrementData, isLoading: incrementLoading } =
   //   useSWR<IncrementTweetsStats>(
@@ -84,14 +86,12 @@ export function Dashboard() {
   }, [selectedToken, tokenData]);
 
   const tokenImage = useMemo(() => {
-    return marketData?.info?.imageUrl || tokenData?.pumpfun?.uri;
-  }, [tokenData, marketData]);
+    return marketData?.info?.imageUrl || birdeyeData?.tokenImage || "";
+  }, [birdeyeData, marketData]);
 
   const holders = useMemo(() => {
     return birdeyeData?.holder || 0;
   }, [birdeyeData]);
-
-  console.log(birdeyeData, selectedToken, "bird");
 
   return (
     <div className="space-y-6 lg:ml-[320px]">
@@ -101,6 +101,7 @@ export function Dashboard() {
         <TokenHeaderSkeleton />
       ) : (
         <TokenHeader
+          birdeyeData={birdeyeData as BirdEyeTokenSimpleOverview}
           tokenImage={tokenImage || ""}
           marketData={marketData as TokenMarketInfo}
         />
@@ -143,12 +144,12 @@ export function Dashboard() {
             />
             <MetricCard
               title="Vol"
-              value={marketData?.volume?.h24 || 0}
+              value={formatCurrency(birdeyeData?.volume?.h24 || 0)}
               icon="bar-chart"
               changes={{
-                fiveMin: `$${(marketData?.volume?.m5 || 0).toLocaleString()}`,
-                oneHour: `$${(marketData?.volume?.h1 || 0).toLocaleString()}`,
-                sixHours: `$${(marketData?.volume?.h6 || 0).toLocaleString()}`,
+                fiveMin: `${formatCurrency(birdeyeData?.volume?.m30 || 0)}`,
+                oneHour: `${formatCurrency(birdeyeData?.volume?.h1 || 0)}`,
+                sixHours: `${formatCurrency(birdeyeData?.volume?.h8 || 0)}`,
               }}
             />
             <MetricCard
