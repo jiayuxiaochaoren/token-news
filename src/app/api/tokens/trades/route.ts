@@ -24,6 +24,9 @@ export async function GET(request: NextRequest) {
 
     const tokenOverview = resp?.data?.data as BirdEyeTokenOverview;
     const data: BirdEyeTokenSimpleOverview = {
+      name: tokenOverview?.name || "",
+      symbol: tokenOverview?.symbol || "",
+      tokenAddress: tokenOverview?.address || "",
       holder: tokenOverview?.holder || 0,
       price: tokenOverview?.price || 0,
       mc: tokenOverview?.mc || 0,

@@ -55,6 +55,9 @@ export type BirdEyeTokenOverview = {
 };
 
 export type BirdEyeTokenSimpleOverview = {
+  name: string;
+  tokenAddress: string;
+  symbol: string;
   holder: number;
   price: number;
   mc: number;

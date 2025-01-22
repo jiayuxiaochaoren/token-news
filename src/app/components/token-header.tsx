@@ -9,11 +9,9 @@ import {
 
 export function TokenHeader({
   birdeyeData,
-  marketData,
   tokenImage,
 }: {
   birdeyeData: BirdEyeTokenSimpleOverview;
-  marketData: TokenMarketInfo;
   tokenImage: string;
 }) {
   return (
@@ -21,23 +19,19 @@ export function TokenHeader({
       <div className="flex items-center gap-3">
         <Image
           src={tokenImage}
-          alt={marketData?.baseToken?.symbol || ""}
+          alt={birdeyeData?.symbol || ""}
           width={48}
           height={48}
         />
         <div>
           <div className="flex items-center gap-2">
-            <span className="text-lg font-bold">
-              {marketData?.baseToken?.symbol}
-            </span>
+            <span className="text-lg font-bold">{birdeyeData?.symbol}</span>
             {/* <span className="text-lg">▼</span> */}
             <span className="text-sm text-[#a3a3a3]">
-              {abbreviateString(marketData?.baseToken?.address)}
+              {abbreviateString(birdeyeData?.tokenAddress)}
             </span>
           </div>
-          <div className="text-sm text-[#a3a3a3]">
-            {marketData?.baseToken?.name}
-          </div>
+          <div className="text-sm text-[#a3a3a3]">{birdeyeData?.name}</div>
         </div>
       </div>
       <div className="flex items-center gap-4">

@@ -30,13 +30,13 @@ export function Dashboard() {
   const { selectedToken } = useToken();
   const [socialViewMode, setSocialViewMode] = useState<SocialViewMode>("like");
 
-  const {
-    data: marketData,
-    error: marketError,
-    isLoading: marketLoading,
-  } = useSWR(selectedToken || null, getMarketData, {
-    refreshInterval: selectedToken ? 5000 : 0,
-  });
+  // const {
+  //   data: marketData,
+  //   error: marketError,
+  //   isLoading: marketLoading,
+  // } = useSWR(selectedToken || null, getMarketData, {
+  //   refreshInterval: selectedToken ? 5000 : 0,
+  // });
 
   const { data: tokenData, isLoading: tokenLoading } = useSWR<AiAnalyze>(
     selectedToken ? `/api/tokens/basic?tokenAddress=${selectedToken}` : null,
@@ -86,8 +86,8 @@ export function Dashboard() {
   }, [selectedToken, tokenData]);
 
   const tokenImage = useMemo(() => {
-    return marketData?.info?.imageUrl || birdeyeData?.tokenImage || "";
-  }, [birdeyeData, marketData]);
+    return tokenData?.token_image || birdeyeData?.tokenImage || "";
+  }, [birdeyeData, tokenData]);
 
   const holders = useMemo(() => {
     return birdeyeData?.holder || 0;
@@ -97,13 +97,12 @@ export function Dashboard() {
     <div className="space-y-6 lg:ml-[320px]">
       <h1 className="text-xl font-semibold">Dashboard</h1>
 
-      {isLoading && marketLoading ? (
+      {isLoading ? (
         <TokenHeaderSkeleton />
       ) : (
         <TokenHeader
           birdeyeData={birdeyeData as BirdEyeTokenSimpleOverview}
           tokenImage={tokenImage || ""}
-          marketData={marketData as TokenMarketInfo}
         />
       )}
       {isLoading ? (

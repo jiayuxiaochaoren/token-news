@@ -23,6 +23,7 @@ export type AiAnalyze = {
   replied_accounts: TopTwitterAccount[];
   increment_stats: IncrementTweetsStats;
   analysis: MultLangAnalyzeMap;
+  token_image?: string;
 };
 
 export type PumpfunMetadata = {
