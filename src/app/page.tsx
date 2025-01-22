@@ -4,6 +4,9 @@ import { Header } from "./components/header";
 import { Sidebar } from "./components/sidebar";
 import { TokenProvider } from "@/contexts/token-context";
 
+// 设置页面缓存
+export const revalidate = 5;
+
 export default async function Page() {
   const defaultList = await getAlertsList({ page: 1 });
 
