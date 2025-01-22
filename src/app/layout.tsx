@@ -4,6 +4,7 @@ import "@/app/globals.css";
 import { Sidebar } from "@/app/components/sidebar";
 import { LoadingProvider } from "@/contexts/loading-context";
 import { Header } from "./components/header";
+import { MonitoringProvider } from "@/contexts/monitoring-context";
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
@@ -25,7 +26,9 @@ export default function RootLayout({
       <body
         className={`${spaceGrotesk.variable} font-sans antialiased bg-[#171717] text-[#ffffff]`}
       >
-        <LoadingProvider>{children}</LoadingProvider>
+        <MonitoringProvider>
+          <LoadingProvider>{children}</LoadingProvider>
+        </MonitoringProvider>
       </body>
     </html>
   );

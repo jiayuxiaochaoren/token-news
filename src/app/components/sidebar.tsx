@@ -18,6 +18,7 @@ import useSWR from "swr";
 import { fetcher } from "@/_lib/fetcher";
 import { HotTokenInfo } from "@/types/tokens";
 import { DINGCAT_USER_DID } from "@/constants";
+import { useMonitoring } from "@/contexts/monitoring-context";
 
 type ViewMode = "alert" | "rank";
 
@@ -29,6 +30,11 @@ export function Sidebar({ defaultList }: { defaultList: MessageStruct[] }) {
   const [list, setList] = useState<MessageStruct[]>(defaultList);
   const { setSelectedToken, selectedToken } = useToken();
   console.log("selectedToken", selectedToken);
+  const { isPusherEnabled, isSoundEnabled } = useMonitoring();
+  const [tokenAlertCounts, setTokenAlertCounts] = useState<
+    Record<string, number>
+  >({});
+
   const handleTokenSelect = (tokenAddress: string, index: number) => {
     setSelectedToken(tokenAddress);
     setSelectedId(index);
@@ -47,13 +53,38 @@ export function Sidebar({ defaultList }: { defaultList: MessageStruct[] }) {
     }
   }, [defaultList]);
 
+  const playAlertSound = () => {
+    const audio = new Audio("/warning-alarm-loop.mp3");
+    audio.play().catch(console.error);
+    console.log("playAlertSound");
+  };
+
   useEffect(() => {
+    if (!isPusherEnabled) return;
+
     const handleNewPusher = (fomoInfo: MessageStruct) => {
       if (fomoInfo) {
         setList((prev) => {
           const newList = [fomoInfo, ...prev];
           return newList;
         });
+
+        if (isSoundEnabled) {
+          setTokenAlertCounts((prev) => {
+            const newCount = (prev[fomoInfo.tokenAddress] || 0) + 1;
+            if (newCount >= 3) {
+              playAlertSound();
+              return {
+                ...prev,
+                [fomoInfo.tokenAddress]: 0,
+              };
+            }
+            return {
+              ...prev,
+              [fomoInfo.tokenAddress]: newCount,
+            };
+          });
+        }
       }
     };
 
@@ -66,7 +97,7 @@ export function Sidebar({ defaultList }: { defaultList: MessageStruct[] }) {
     return () => {
       channel?.unbind(event, handleNewPusher);
     };
-  }, []);
+  }, [isPusherEnabled, isSoundEnabled]);
 
   return (
     <>

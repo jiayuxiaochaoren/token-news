@@ -1,6 +1,7 @@
 import { getAlertsList } from "./actions/alerts";
 import { Dashboard } from "./components/dashboard";
 import { Header } from "./components/header";
+import { MonitoringControls } from "./components/monitoring-controls";
 import { Sidebar } from "./components/sidebar";
 import { TokenProvider } from "@/contexts/token-context";
 
@@ -23,6 +24,7 @@ export default async function Page() {
             </main>
           </div>
         </div>
+        <MonitoringControls />
       </div>
     </TokenProvider>
   );
