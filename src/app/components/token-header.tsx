@@ -11,9 +11,11 @@ import TraderLinks from "./trader-links";
 export function TokenHeader({
   birdeyeData,
   tokenImage,
+  tokenAddress,
 }: {
   birdeyeData: BirdEyeTokenSimpleOverview;
   tokenImage: string;
+  tokenAddress: string;
 }) {
   return (
     <div className="flex items-center justify-between bg-[#262626]/50 rounded-lg p-4">
@@ -65,7 +67,7 @@ export function TokenHeader({
           </div>
         </div>
         <div className="flex justify-end">
-          <TraderLinks tokenAddress={birdeyeData?.tokenAddress} />
+          <TraderLinks tokenAddress={tokenAddress} />
         </div>
       </div>
     </div>

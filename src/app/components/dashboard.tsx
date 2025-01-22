@@ -103,6 +103,7 @@ export function Dashboard() {
         <TokenHeader
           birdeyeData={birdeyeData as BirdEyeTokenSimpleOverview}
           tokenImage={tokenImage || ""}
+          tokenAddress={selectedToken || ""}
         />
       )}
       {isLoading ? (

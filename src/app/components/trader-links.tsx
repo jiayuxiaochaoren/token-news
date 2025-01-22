@@ -7,13 +7,11 @@ const TraderLinks = ({
   tokenAddress,
   size = 16,
   radius = 6,
-  visibleLinks = 3,
   gap = 12,
 }: {
   tokenAddress: string;
   size?: number;
   radius?: number;
-  visibleLinks?: number;
   gap?: number;
 }) => {
   const params = bs58.encode(
@@ -29,20 +27,6 @@ const TraderLinks = ({
       event: "gmgn.ai",
     },
     {
-      name: "Bitget",
-      url: `https://t.me/BitgetWallet_TGBot/BGW?startapp=quoteInfo-${params}`,
-      icon: "/link/bitget.png",
-      event: "bitget.com",
-      br: 50,
-    },
-    {
-      name: "Ave",
-      // url: `https://ave.ai/token/${tokenAddress}-solana?ref=fiacc218`,
-      url: `https://ave.ai/token/${tokenAddress}-solana`,
-      icon: "/link/ave.png",
-      event: "ave.ai",
-    },
-    {
       name: "Photon",
       // url: `https://photon-sol.tinyastro.io/en/r/@pumpnews/${tokenAddress}`,
       url: `https://photon-sol.tinyastro.io/en/lp/${tokenAddress}`,
@@ -56,13 +40,7 @@ const TraderLinks = ({
       icon: "/link/bullx.svg",
       event: "bullx.io",
     },
-    {
-      name: "UniversalX",
-      // url: `https://universalx.app/tokens/101_${tokenAddress}?inviteCode=PUMPNW`,
-      url: `https://universalx.app/tokens/101_${tokenAddress}`,
-      icon: "/link/universaix.svg",
-      event: "universalx.app",
-    },
+
     {
       name: "Trojan",
       // url: `https://t.me/diomedes_trojanbot?start=r-bob6112-${tokenAddress}`,
